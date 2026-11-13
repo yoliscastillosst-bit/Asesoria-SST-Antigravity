@@ -21,3 +21,16 @@
 .sst-chat-disclaimer{font-size:.67rem;color:#8a7d72;text-align:center;margin:0;padding:0 10px 9px;background:#fff}
 .sst-chat-sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 @media(max-width:480px){.sst-chat-launcher{right:14px;bottom:14px}.sst-chat-panel{right:10px;bottom:72px;width:calc(100vw - 20px);height:min(620px,calc(100dvh - 92px))}}
+
+/* Chatbot: coherencia con la paleta otoñal */
+:root {
+  --chat-primary: #374001;
+  --chat-accent: #E88005;
+  --chat-brown: #5A1903;
+  --chat-terra: #E86531;
+  --chat-red: #E8412F;
+}
+.chatbot-widget, .chat-widget, .chatbot-panel, .chat-window { border-color: #EAD8C5; }
+.chatbot-header, .chat-header { background: linear-gradient(120deg, #374001, #5A1903); }
+.chatbot-toggle, .chat-toggle, .chatbot-send, .chat-send { background: #374001; }
+.chatbot-toggle:hover, .chat-toggle:hover, .chatbot-send:hover, .chat-send:hover { background: #5A1903; }
