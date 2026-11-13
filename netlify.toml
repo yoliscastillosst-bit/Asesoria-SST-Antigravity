@@ -1,1 +1,2 @@
-[build]\n  publish = "web"\n  command = ""\n\n[build.processing]\n  skip_processing = false\n
+[build]
+  publish = "web"
