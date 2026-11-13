@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portal Privado de Entregables SG-SST | Asesoría en Propiedad Horizontal</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%231e3a8a'><path d='M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z'/></svg>">
+  <style>
+    /* Estilos específicos ejecutivos para el Portal de Entregables */
+    .deliverables-header {
+      background: #ffffff;
+      border-bottom: 1px solid var(--border);
+      padding: 18px 0;
+      box-shadow: var(--shadow-sm);
+    }
+    .client-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .client-info-box {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .client-selector-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .deliverable-nav {
+      background: #ffffff;
+      border-bottom: 2px solid var(--border);
+      overflow-x: auto;
+      white-space: nowrap;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .deliverable-tabs-list {
+      display: flex;
+      list-style: none;
+      gap: 8px;
+      padding: 0 24px;
+      max-width: 1240px;
+      margin: 0 auto;
+    }
+    .deliverable-tab {
+      padding: 16px 20px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: var(--muted);
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: var(--transition);
+      user-select: none;
+    }
+    .deliverable-tab:hover {
+      color: var(--primary);
+    }
+    .deliverable-tab.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+      background: rgba(239, 246, 255, 0.6);
+    }
+    .tab-pane {
+      display: none;
+      padding: 36px 0 60px;
+    }
+    .tab-pane.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+    .panel-card {
+      background: #ffffff;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-md);
+      padding: 32px 30px;
+      margin-bottom: 28px;
+    }
+    .panel-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .score-circle-card {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      background: #f8fafc;
+      border-radius: var(--radius-md);
+      padding: 18px 24px;
+      border: 1px solid var(--border);
+    }
+    .score-big {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: var(--primary);
+      line-height: 1;
+    }
+    .status-pill {
+      display: inline-block;
+      font-size: 0.78rem;
+      font-weight: 800;
+      padding: 4px 12px;
+      border-radius: var(--radius-full);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .status-danger { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
+    .status-warning { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
+    .status-success { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
+
+    /* Tablas técnicas */
+    .data-table-wrap {
+      overflow-x: auto;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+    }
+    .tech-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+      text-align: left;
+    }
+    .tech-table th {
+      background: #f8fafc;
+      color: var(--dark);
+      font-weight: 700;
+      padding: 14px 16px;
+      border-bottom: 1.5px solid var(--border);
+      white-space: nowrap;
+    }
+    .tech-table td {
+      padding: 13px 16px;
+      border-bottom: 1px solid #f1f5f9;
+      color: var(--dark);
+    }
+    .tech-table tbody tr:hover {
+      background-color: #f8fafc;
+    }
+    .badge {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+    .badge-success { background: #ecfdf5; color: #047857; }
+    .badge-danger { background: #fef2f2; color: #b91c1c; }
+    .badge-warning { background: #fffbeb; color: #b45309; }
+    .badge-neutral { background: #f1f5f9; color: #475569; }
+
+    .risk-badge {
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 0.78rem;
+      display: inline-block;
+      white-space: nowrap;
+    }
+    .risk-i { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+    .risk-ii { background: #ffedd5; color: #c2410c; border: 1px solid #fed7aa; }
+    .risk-iii { background: #fef9c3; color: #854d0e; border: 1px solid #fef08a; }
+    .risk-iv { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+
+    .pill-tag {
+      background: #eff6ff;
+      color: #1d4ed8;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 4px;
+      display: inline-block;
+    }
+    .progress-bar-bg {
+      background: #e2e8f0;
+      height: 8px;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 4px;
+    }
+    .progress-bar-fill {
+      background: var(--secondary);
+      height: 100%;
+      border-radius: 4px;
+    }
+
+    /* KPIs de Indicadores */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 22px;
+      margin-bottom: 30px;
+    }
+    .kpi-card {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      border-top: 4px solid var(--primary-light);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition);
+    }
+    .kpi-card:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+    .kpi-top-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .kpi-val {
+      font-size: 2.3rem;
+      font-weight: 800;
+      color: var(--dark);
+      margin: 4px 0 8px 0;
+      line-height: 1.1;
+    }
+    .kpi-title {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .kpi-desc {
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===================================================================
+       ENCABEZADO DE GESTIÓN Y BARRA DE SELECCIÓN DE COPROPIEDAD
+       =================================================================== -->
+  <header class="deliverables-header">
+    <div class="container client-bar">
+      <!-- Info y Avatar de la Copropiedad Activa -->
+      <div class="client-info-box">
+        <div class="client-avatar-badge" id="clientAvatar">
+          AB
+        </div>
+        <div>
+          <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+            <h2 id="clientNameHeader" style="font-size: 1.15rem; font-weight: 800; color: var(--dark); margin: 0;">
+              Conjunto Residencial Alameda del Bosque PH
+            </h2>
+            <span class="course-status-pill in-progress" id="courseStatusBadge">
+              <span class="kpi-status-dot dot-yellow"></span> Curso 50h SST: En Culminación
+            </span>
+          </div>
+          <p id="clientMetaHeader" style="font-size: 0.8rem; color: var(--muted); margin: 2px 0 0 0;">
+            NIT: 901.452.889-3 • Residencial (128 Unidades, 4 Torres) • Bogotá D.C.
+          </p>
+        </div>
+      </div>
+
+      <!-- Acciones Ejecutivas: Selector, PDF y Retorno -->
+      <div class="client-selector-wrap">
+        <div>
+          <label for="copropiedadSelector" style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--muted); text-transform: uppercase;">Cambiar Copropiedad:</label>
+          <select id="copropiedadSelector" class="form-control" style="padding: 6px 12px; min-width: 280px; font-weight: 600; font-size: 0.85rem;">
+            <option value="1">Alameda del Bosque PH (NIT: 901.452.889-3)</option>
+          </select>
+        </div>
+
+        <button type="button" class="btn btn-outline" onclick="window.print()" title="Generar PDF Oficial con todos los entregables" style="padding: 9px 16px; font-size: 0.85rem;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 6 2 18 2 18 9"></polyline>
+            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+            <rect x="6" y="14" width="12" height="8"></rect>
+          </svg>
+          Exportar a PDF
+        </button>
+
+        <a href="/index.html" class="btn btn-portal" style="padding: 9px 16px; font-size: 0.85rem;">
+          ← Web Comercial
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===================================================================
+       PESTAÑAS TÉCNICAS DE ENTREGABLES (PRIVADAS DEL CLIENTE)
+       =================================================================== -->
+  <nav class="deliverable-nav">
+    <ul class="deliverable-tabs-list">
+      <li class="deliverable-tab active" data-target="tab-diagnostico">
+        📋 1. Diagnóstico Inicial (Res. 0312)
+      </li>
+      <li class="deliverable-tab" data-target="tab-matriz">
+        ⚠️ 2. Matriz de Peligros (GTC 45)
+      </li>
+      <li class="deliverable-tab" data-target="tab-planes">
+        🎯 3. Planes de Acción & Mejora
+      </li>
+      <li class="deliverable-tab" data-target="tab-cronogramas">
+        📅 4. Cronogramas & Seguimiento
+      </li>
+      <li class="deliverable-tab" data-target="tab-indicadores">
+        📊 5. Indicadores del SG-SST
+      </li>
+      <li class="deliverable-tab" data-target="tab-auditoria">
+        ⚖️ 6. Auditoría & Reporte ARL/MinTrabajo
+      </li>
+    </ul>
+  </nav>
+
+  <!-- ===================================================================
+       CONTENIDO PRINCIPAL POR ENTREGABLE
+       =================================================================== -->
+  <main class="container">
+
+    <!-- ---------------------------------------------------------------
+         TAB 1: DIAGNÓSTICO INICIAL (RES. 0312 DE 2019)
+         --------------------------------------------------------------- -->
+    <div id="tab-diagnostico" class="tab-pane active">
+      <div class="panel-card">
+        <div class="panel-card-header">
+          <div>
+            <span class="section-tag" style="margin-bottom: 6px;">Línea Base Legal</span>
+            <h3 style="font-size: 1.35rem; color: var(--dark); margin: 0 0 4px 0;">
+              Autoevaluación de Estándares Mínimos (Resolución 0312 de 2019)
+            </h3>
+            <p style="font-size: 0.88rem; color: var(--muted); margin: 0;">
+              Evaluación diagnóstica cuantitativa del ciclo PHVA para clasificar el estado de la copropiedad frente al Ministerio del Trabajo.
+            </p>
+          </div>
+          <div class="score-circle-card">
+            <div>
+              <div style="font-size: 0.75rem; font-weight: 700; color: var(--muted); text-transform: uppercase;">Puntaje Legal</div>
+              <div id="diagScoreBadge" class="score-big">38.5%</div>
+            </div>
+            <div>
+              <div style="font-size: 0.75rem; font-weight: 700; color: var(--muted); text-transform: uppercase;">Estado Jurídico</div>
+              <span id="diagStatusBadge" class="status-pill status-danger">Crítico (< 60%)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Banner Visual de Semáforo y Barra de Progreso del Diagnóstico -->
+        <div class="diag-semaphor-banner">
+          <div class="diag-summary-box">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 0.85rem; font-weight: 700; color: var(--dark);">Cumplimiento Ponderado de Estándares:</span>
+              <span id="diagProgressText" style="font-size: 0.95rem; font-weight: 800; color: var(--primary);">38.5 / 100 Pts</span>
+            </div>
+            <div class="diag-progress-outer">
+              <div id="diagProgressBar" class="diag-progress-inner" style="width: 38.5%; background: linear-gradient(90deg, #ef4444 0%, #dc2626 100%);"></div>
+            </div>
+            <div class="diag-thresholds">
+              <span style="color: #dc2626;">🔴 Crítico: Menor al 60%</span>
+              <span style="color: #d97706;">🟡 Moderadamente Aceptable: 60% a 85%</span>
+              <span style="color: #16a34a;">🟢 Aceptable: Mayor a 85%</span>
+            </div>
+          </div>
+
+          <!-- Dictamen Legal Inmediato -->
+          <div id="diagLegalAdvice" style="background: #fef2f2; border: 1.5px solid #fecaca; border-radius: var(--radius-md); padding: 18px; font-size: 0.82rem; color: #991b1b; display: flex; flex-direction: column; justify-content: center;">
+            <strong style="margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
+              ⚠️ Dictamen Normativo (Res. 0312 Art. 28):
+            </strong>
+            <span>La copropiedad se encuentra en estado <strong>CRÍTICO</strong>. Es obligatorio formular de inmediato el Plan de Mejoramiento a 3 meses y remitir evidencias de avance a la ARL.</span>
+          </div>
+        </div>
+
+        <div class="data-table-wrap">
+          <table class="tech-table">
+            <thead>
+              <tr>
+                <th style="width: 80px;">Ítem</th>
+                <th>Estándar Mínimo Evaluado</th>
+                <th style="width: 110px; text-align: center;">Puntaje Máx</th>
+                <th style="width: 130px; text-align: center;">Estado Legal</th>
+                <th style="width: 100px; text-align: center;">Puntos</th>
+              </tr>
+            </thead>
+            <tbody id="diagItemsTable">
+              <!-- Renderizado dinámico desde entregables.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ---------------------------------------------------------------
+         TAB 2: MATRIZ DE IDENTIFICACIÓN DE PELIGROS (GTC 45) CON FILTROS
+         --------------------------------------------------------------- -->
+    <div id="tab-matriz" class="tab-pane">
+      <div class="panel-card">
+        <div class="panel-card-header">
+          <div>
+            <span class="section-tag" style="margin-bottom: 6px;">Gestión de Peligros Locativos</span>
+            <h3 style="font-size: 1.35rem; color: var(--dark); margin: 0 0 4px 0;">
+              Matriz de Identificación de Peligros y Valoración de Riesgos (GTC 45)
+            </h3>
+            <p style="font-size: 0.88rem; color: var(--muted); margin: 0;">
+              Identificación técnica de áreas críticas (bombas, subestación, tanques, shut, piscina, fachadas) y controles para personal OPS y subcontratado.
+            </p>
+          </div>
+          <button class="btn btn-outline" onclick="window.print()" style="padding: 8px 16px; font-size: 0.85rem;">
+            Exportar Matriz en PDF
+          </button>
+        </div>
+
+        <!-- Barra de Filtros Dinámicos de la Matriz IPVR -->
+        <div class="matrix-filters-card">
+          <div class="matrix-filter-controls">
+            <!-- Filtro por Área / Zona -->
+            <div>
+              <label for="filterArea" style="display: block; font-size: 0.72rem; font-weight: 700; color: var(--muted); text-transform: uppercase; margin-bottom: 2px;">Filtrar por Área / Zona:</label>
+              <select id="filterArea" class="matrix-filter-select">
+                <option value="ALL">Todas las Áreas</option>
+                <option value="Subestación">Subestación y Tableros Eléctricos</option>
+                <option value="Motobombas">Cuarto de Motobombas</option>
+                <option value="Tanques">Tanques de Agua (Confinados)</option>
+                <option value="Shut">Shut de Basuras y Acopio</option>
+                <option value="Fachadas">Fachadas y Cubiertas (Alturas)</option>
+                <option value="Portería">Portería y Vigilancia</option>
+              </select>
+            </div>
+
+            <!-- Filtro por Tipo de Personal -->
+            <div>
+              <label for="filterPersonal" style="display: block; font-size: 0.72rem; font-weight: 700; color: var(--muted); text-transform: uppercase; margin-bottom: 2px;">Personal Expuesto:</label>
+              <select id="filterPersonal" class="matrix-filter-select">
+                <option value="ALL">Todo el Personal</option>
+                <option value="OPS">OPS / Toderos Mantenimiento</option>
+                <option value="Subcontratado">Subcontratado (Aseo / Vigilancia)</option>
+                <option value="Especializado">Contratistas Especializados</option>
+              </select>
+            </div>
+
+            <!-- Filtro por Nivel de Riesgo -->
+            <div>
+              <label for="filterRisk" style="display: block; font-size: 0.72rem; font-weight: 700; color: var(--muted); text-transform: uppercase; margin-bottom: 2px;">Nivel de Riesgo (NR):</label>
+              <select id="filterRisk" class="matrix-filter-select">
+                <option value="ALL">Todos los Niveles</option>
+                <option value="I">Nivel I - Crítico (No Aceptable)</option>
+                <option value="II">Nivel II - Alto (Aceptable c/ Control)</option>
+                <option value="III">Nivel III - Medio</option>
+              </select>
+            </div>
+
+            <!-- Buscador en tiempo real -->
+            <div>
+              <label for="searchMatrix" style="display: block; font-size: 0.72rem; font-weight: 700; color: var(--muted); text-transform: uppercase; margin-bottom: 2px;">Buscar Peligro o Control:</label>
+              <input type="text" id="searchMatrix" class="matrix-search-input" placeholder="Ej: eléctrico, cloro, alturas...">
+            </div>
+          </div>
+
+          <div class="matrix-count-badge" id="matrixCountBadge">
+            Mostrando 6 de 6 peligros
+          </div>
+        </div>
+
+        <div class="data-table-wrap">
+          <table class="tech-table">
+            <thead>
+              <tr>
+                <th>Área / Proceso</th>
+                <th>Personal Expuesto</th>
+                <th>Peligro & Clasificación</th>
+                <th style="text-align: center;">NP</th>
+                <th style="text-align: center;">NC</th>
+                <th style="text-align: center;">Nivel Riesgo (NR)</th>
+                <th>Medidas de Intervención / Controles</th>
+              </tr>
+            </thead>
+            <tbody id="matrizTableBody">
+              <!-- Renderizado dinámico desde entregables.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ---------------------------------------------------------------
+         TAB 3: PLANES DE ACCIÓN Y DE MEJORA
+         --------------------------------------------------------------- -->
+    <div id="tab-planes" class="tab-pane">
+      <div class="panel-card">
+        <div class="panel-card-header">
+          <div>
+            <span class="section-tag" style="margin-bottom: 6px;">Subsanación de Hallazgos</span>
+            <h3 style="font-size: 1.35rem; color: var(--dark); margin: 0 0 4px 0;">
+              Planes de Acción y Mejoramiento Continuo
+            </h3>
+            <p style="font-size: 0.88rem; color: var(--muted); margin: 0;">
+              Acciones estructuradas para subsanar los estándares no conformes del diagnóstico y elevar la calificación legal ante la ARL.
+            </p>
+          </div>
+        </div>
+
+        <div class="data-table-wrap">
+          <table class="tech-table">
+            <thead>
+              <tr>
+                <th style="width: 70px;">Estándar</th>
+                <th>Hallazgo / No Conformidad</th>
+                <th>Acción de Mejora Propuesta</th>
+                <th>Responsable</th>
+                <th>Recursos</th>
+                <th>Fecha Límite</th>
+                <th style="width: 140px;">Avance & Estado</th>
+              </tr>
+            </thead>
+            <tbody id="planesTableBody">
+              <!-- Renderizado dinámico desde entregables.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ---------------------------------------------------------------
+         TAB 4: CRONOGRAMAS DE IMPLEMENTACIÓN Y SEGUIMIENTO
+         --------------------------------------------------------------- -->
+    <div id="tab-cronogramas" class="tab-pane">
+      <div class="panel-card">
+        <div class="panel-card-header">
+          <div>
+            <span class="section-tag" style="margin-bottom: 6px;">Ciclo PHVA Anual</span>
+            <h3 style="font-size: 1.35rem; color: var(--dark); margin: 0 0 4px 0;">
+              Cronograma Anual de Trabajo, Capacitaciones e Inspecciones
+            </h3>
+            <p style="font-size: 0.88rem; color: var(--muted); margin: 0;">
+              Seguimiento temporal con porcentajes de ejecución real conforme al Decreto 1072 de 2015.
+            </p>
+          </div>
+        </div>
+
+        <div class="data-table-wrap">
+          <table class="tech-table">
+            <thead>
+              <tr>
+                <th>Programa</th>
+                <th>Actividad Programada</th>
+                <th>Mes</th>
+                <th>Responsable</th>
+                <th>Estado</th>
+                <th style="width: 130px;">Cumplimiento</th>
+              </tr>
+            </thead>
+            <tbody id="cronogramasTableBody">
+              <!-- Renderizado dinámico desde entregables.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ---------------------------------------------------------------
+         TAB 5: TABLERO DE INDICADORES DEL SG-SST (SEMÁFOROS MEJORADOS)
+         --------------------------------------------------------------- -->
+    <div id="tab-indicadores" class="tab-pane">
+      <div class="panel-card">
+        <div class="panel-card-header">
+          <div>
+            <span class="section-tag" style="margin-bottom: 6px;">Métricas Obligatorias</span>
+            <h3 style="font-size: 1.35rem; color: var(--dark); margin: 0 0 4px 0;">
+              Tablero de 6 Indicadores del SG-SST (Resolución 0312 de 2019 art. 30)
+            </h3>
+            <p style="font-size: 0.88rem; color: var(--muted); margin: 0;">
+              Semáforos visuales y comparación rigurosa contra metas legales de estructura, proceso y resultado.
+            </p>
+          </div>
+          <span class="badge badge-success" style="padding: 6px 14px; font-size: 0.82rem;">
+            Vigencia: Año 2026 Acumulado
+          </span>
+        </div>
+
+        <div class="kpi-grid">
+          <!-- 1. Frecuencia de Accidentes -->
+          <div class="kpi-card" style="border-top-color: #10b981;">
+            <div>
+              <div class="kpi-top-row">
+                <span class="kpi-title">Frecuencia de AT (IF)</span>
+                <span class="badge badge-success">🟢 Meta Cumplida</span>
+              </div>
+              <div class="kpi-val" id="indFrecuencia">0.0</div>
+              <div class="kpi-desc">(N° Accidentes de Trabajo en el mes / N° Trabajadores) * 100.</div>
+            </div>
+            <div class="kpi-target-wrap">
+              <div class="kpi-target-header">
+                <span>Resultado: 0.0</span>
+                <span>Meta Legal: 0.0</span>
+              </div>
+              <div class="progress-bar-bg">
+                <div class="progress-bar-fill" style="width: 100%; background: #10b981;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. Severidad de Accidentes -->
+          <div class="kpi-card" style="border-top-color: #10b981;">
+            <div>
+              <div class="kpi-top-row">
+                <span class="kpi-title">Severidad de AT (IS)</span>
+                <span class="badge badge-success">🟢 Meta Cumplida</span>
+              </div>
+              <div class="kpi-val" id="indSeveridad">0.0</div>
+              <div class="kpi-desc">Días de incapacidad por accidentes laborales en el periodo evaluado.</div>
+            </div>
+            <div class="kpi-target-wrap">
+              <div class="kpi-target-header">
+                <span>Días Perdidos: 0</span>
+                <span>Meta Legal: 0 Días</span>
+              </div>
+              <div class="progress-bar-bg">
+                <div class="progress-bar-fill" style="width: 100%; background: #10b981;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. Mortalidad por Accidentes -->
+          <div class="kpi-card" style="border-top-color: #10b981;">
+            <div>
+              <div class="kpi-top-row">
+                <span class="kpi-title">Mortalidad por AT</span>
+                <span class="badge badge-success">🟢 Meta Cumplida</span>
+              </div>
+              <div class="kpi-val" id="indMortalidad" style="color: var(--secondary);">0.0%</div>
+              <div class="kpi-desc">Proporción de eventos mortales de personal directo o subcontratado.</div>
+            </div>
+            <div class="kpi-target-wrap">
+              <div class="kpi-target-header">
+                <span>Resultado: 0.0%</span>
+                <span>Meta Legal: 0%</span>
+              </div>
+              <div class="progress-bar-bg">
+                <div class="progress-bar-fill" style="width: 100%; background: #10b981;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4. Ausentismo por Causa Médica -->
+          <div class="kpi-card" style="border-top-color: #3b82f6;">
+            <div>
+              <div class="kpi-top-row">
+                <span class="kpi-title">Ausentismo Médico</span>
+                <span class="badge badge-success">🟢 Controlado</span>
+              </div>
+              <div class="kpi-val" id="indAusentismo">1.2%</div>
+              <div class="kpi-desc">Días de ausencia por incapacidad sobre días totales programados.</div>
+            </div>
+            <div class="kpi-target-wrap">
+              <div class="kpi-target-header">
+                <span>Resultado: 1.2%</span>
+                <span>Meta Máxima: < 3.0%</span>
+              </div>
+              <div class="progress-bar-bg">
+                <div class="progress-bar-fill" style="width: 40%; background: #3b82f6;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 5. Cumplimiento Plan Anual de Trabajo -->
+          <div class="kpi-card" style="border-top-color: #059669;">
+            <div>
+              <div class="kpi-top-row">
+                <span class="kpi-title">Cumplimiento Plan Anual</span>
+                <span class="badge badge-success">🟢 Conforme</span>
+              </div>
+              <div class="kpi-val" id="indCumplimientoPlan" style="color: var(--secondary);">85%</div>
+              <div class="kpi-desc">Actividades ejecutadas en el cronograma vs actividades planificadas.</div>
+            </div>
+            <div class="kpi-target-wrap">
+              <div class="kpi-target-header">
+                <span>Ejecutado: 85%</span>
+                <span>Meta Legal: ≥ 80%</span>
+              </div>
+              <div class="progress-bar-bg">
+                <div class="progress-bar-fill" style="width: 85%; background: var(--secondary);"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 6. Cobertura del Programa de Capacitación -->
+          <div class="kpi-card" style="border-top-color: #059669;">
+            <div>
+              <div class="kpi-top-row">
+                <span class="kpi-title">Cobertura Capacitaciones</span>
+                <span class="badge badge-success">🟢 Sobresaliente</span>
+              </div>
+              <div class="kpi-val" id="indCapacitacion" style="color: var(--secondary);">92%</div>
+              <div class="kpi-desc">Personal asistente capacitado vs personal total programado.</div>
+            </div>
+            <div class="kpi-target-wrap">
+              <div class="kpi-target-header">
+                <span>Cobertura: 92%</span>
+                <span>Meta Legal: ≥ 90%</span>
+              </div>
+              <div class="progress-bar-bg">
+                <div class="progress-bar-fill" style="width: 92%; background: var(--secondary);"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ---------------------------------------------------------------
+         TAB 6: AUDITORÍA & REPORTE OFICIAL ARL / MINTRABAJO
+         --------------------------------------------------------------- -->
+    <div id="tab-auditoria" class="tab-pane">
+      <div class="panel-card">
+        <div class="panel-card-header">
+          <div>
+            <span class="section-tag" style="margin-bottom: 6px;">Fiscalización Rigurosa</span>
+            <h3 style="font-size: 1.35rem; color: var(--dark); margin: 0 0 4px 0;">
+              Auditoría y Validación de Evidencias para Reporte ante ARL y MinTrabajo
+            </h3>
+            <p style="font-size: 0.88rem; color: var(--muted); margin: 0;">
+              Soporte documental conforme a la Cláusula Novena del Contrato de Asesoría Integral.
+            </p>
+          </div>
+          <span class="badge badge-warning" style="padding: 6px 14px; font-size: 0.82rem;">
+            AUDITORÍA PRE-REPORTE ACTIVA
+          </span>
+        </div>
+
+        <div style="background: #fffbeb; border-left: 4px solid var(--warning); padding: 18px 20px; border-radius: 6px; margin-bottom: 24px;">
+          <h4 style="font-size: 0.98rem; color: #b45309; margin: 0 0 6px 0; font-weight: 700;">
+            ⚠️ Protocolo Legal No Negociable de Fiscalización:
+          </h4>
+          <p style="font-size: 0.88rem; color: #78350f; line-height: 1.55; margin: 0;">
+            Nuestra firma asesora <strong>no transmitirá ni avalará reportes oficiales de autoevaluación</strong> ante la Administradora de Riesgos Laborales (ARL) ni ante la plataforma del Ministerio del Trabajo (Fondo de Riesgos Laborales) sin la verificación fehaciente de las evidencias documentales entregadas por la copropiedad.
+          </p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; margin-bottom: 28px;">
+          <div style="background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 22px;">
+            <h4 style="font-size: 1rem; margin-bottom: 12px; color: var(--dark); font-weight: 700;">
+              1. Verificación del Responsable Interno
+            </h4>
+            <div style="font-size: 0.88rem; line-height: 1.65;">
+              <p><strong>Exigencia Legal:</strong> Art. 4, 9 o 17 de la Res. 0312 de 2019.</p>
+              <p><strong>Designado por la PH:</strong> Administrador(a) en ejercicio.</p>
+              <p><strong>Certificación Curso 50 Horas SST:</strong> <span class="badge badge-warning">En proceso de culminación (15 días)</span></p>
+              <p style="color: var(--muted); font-size: 0.8rem; margin-top: 8px; border-top: 1px solid var(--border); padding-top: 8px;">
+                * La copropiedad debe radicar el certificado antes de habilitar el cargue oficial.
+              </p>
+            </div>
+          </div>
+
+          <div style="background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 22px;">
+            <h4 style="font-size: 1rem; margin-bottom: 12px; color: var(--dark); font-weight: 700;">
+              2. Soportes Fidedignos Auditados
+            </h4>
+            <ul style="list-style: none; font-size: 0.86rem; line-height: 1.8;">
+              <li>✓ Planillas PILA de vigilancia y aseo al día (Auditadas).</li>
+              <li>✓ Matriz IPVR levantada y firmada por especialista SST.</li>
+              <li>⏳ Actas de conformación de COPASST / Vigía (Pendiente firma de actas).</li>
+              <li>⏳ Certificados de mantenimiento de red contra incendios (Pendiente pago copropiedad).</li>
+            </ul>
+          </div>
+        </div>
+
+        <div style="text-align: right; border-top: 1px solid var(--border); padding-top: 18px;">
+          <button class="btn btn-outline" disabled style="opacity: 0.6; cursor: not-allowed; padding: 10px 20px;">
+            Habilitar Cargue Oficial a Plataforma MinTrabajo
+          </button>
+          <span style="display: block; font-size: 0.78rem; color: var(--muted); margin-top: 6px;">
+            Se habilitará una vez se audite el 100% de las evidencias fidedignas radicadas por la administración.
+          </span>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script src="js/entregables.js"></script>
+</body>
+</html>
